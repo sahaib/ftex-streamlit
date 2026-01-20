@@ -213,7 +213,15 @@ class ReportGenerator:
         with_response = [t for t in tickets if t.first_response_time is not None]
         resolved = [t for t in tickets if t.is_resolved]
         
-        sla_threshold = self.config.get('sla', 'first_response_hours', default=12)
+        # Handle ConfigManager or dict config
+        if hasattr(self.config, 'get') and callable(getattr(self.config, 'get')):
+            try:
+                sla_threshold = self.config.get('sla', 'first_response_hours', default=12)
+            except TypeError:
+                # Regular dict - use dict access
+                sla_threshold = self.config.get('sla', {}).get('first_response_hours', 12)
+        else:
+            sla_threshold = 12
         sla_met = sum(1 for t in with_response if t.first_response_time <= sla_threshold)
         
         return {
@@ -416,8 +424,12 @@ class ReportGenerator:
         ws['A1'] = "SLA Performance Analysis"
         ws['A1'].font = Font(bold=True, size=14)
         
-        sla_config = self.config.get('sla', default={})
-        bands = sla_config.get('bands', {})
+        # Handle ConfigManager or dict config
+        try:
+            sla_config = self.config.get('sla', default={})
+        except TypeError:
+            sla_config = self.config.get('sla', {}) if isinstance(self.config, dict) else {}
+        bands = sla_config.get('bands', {}) if isinstance(sla_config, dict) else {}
         
         ws['A3'] = "SLA Band Definitions"
         ws['A4'] = "Band"
@@ -585,7 +597,11 @@ class ReportGenerator:
     
     def _create_entities(self):
         ws = self.wb.create_sheet("🏢 Entities")
-        entity_name = self.config.get('industry', 'primary_entity', default='customer').title()
+        # Handle ConfigManager or dict config
+        try:
+            entity_name = self.config.get('industry', 'primary_entity', default='customer').title()
+        except TypeError:
+            entity_name = self.config.get('industry', {}).get('primary_entity', 'customer').title() if isinstance(self.config, dict) else 'Customer'
         headers = [entity_name, 'Tickets', 'Open', 'Stale', 'Companies']
         for col, h in enumerate(headers, 1):
             ws.cell(row=1, column=col, value=h)

@@ -31,6 +31,184 @@ init_session_state()
 config = get_config()
 
 
+def render_freshdesk_connector(config):
+    """Render Freshdesk connector settings and sync UI."""
+    
+    st.markdown("##### 🎫 Freshdesk Configuration")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        domain = st.text_input(
+            "Domain",
+            value=config.get('freshdesk', 'domain', default=''),
+            placeholder="your-company",
+            key="fd_domain",
+            help="Your Freshdesk subdomain (company.freshdesk.com → 'company')"
+        )
+        
+        api_key = st.text_input(
+            "API Key",
+            type="password",
+            value=config.get('freshdesk', 'api_key', default=''),
+            key="fd_api_key",
+            help="Found in Profile Settings → API Key"
+        )
+    
+    with col2:
+        group_id = st.number_input(
+            "Group ID (optional)",
+            value=config.get('freshdesk', 'group_id', default=0) or 0,
+            min_value=0,
+            key="fd_group",
+            help="Filter tickets by support group"
+        )
+        
+        days_to_fetch = st.number_input(
+            "Days to Fetch",
+            value=config.get('freshdesk', 'days_to_fetch', default=180),
+            min_value=1,
+            max_value=365,
+            key="fd_days"
+        )
+    
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        include_convs = st.toggle(
+            "Include conversations",
+            value=config.get('freshdesk', 'include_conversations', default=True),
+            key="fd_convs",
+            help="Required for AI analysis"
+        )
+    
+    with col4:
+        include_notes = st.toggle(
+            "Include private notes",
+            value=config.get('freshdesk', 'include_notes', default=True),
+            key="fd_notes"
+        )
+    
+    st.divider()
+    
+    # Action buttons
+    col_test, col_sync = st.columns(2)
+    
+    with col_test:
+        if st.button("🔗 Test Connection", use_container_width=True):
+            if not domain or not api_key:
+                st.error("Please enter domain and API key")
+            else:
+                with st.spinner("Testing..."):
+                    try:
+                        from core.freshdesk_api import FreshdeskClient, FreshdeskConfig
+                        
+                        test_config = FreshdeskConfig(
+                            domain=domain,
+                            api_key=api_key,
+                            group_id=int(group_id) if group_id else None,
+                        )
+                        client = FreshdeskClient(config=test_config)
+                        
+                        if client.test_connection():
+                            rate = client.get_rate_limit_info()
+                            st.success(f"✅ Connected! Rate: {rate['remaining']}/{rate['total']}")
+                        else:
+                            st.error("❌ Failed. Check credentials.")
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)[:100]}")
+    
+    with col_sync:
+        sync_btn = st.button("🚀 Sync Tickets", type="primary", use_container_width=True)
+    
+    # Sync execution
+    if sync_btn:
+        if not domain or not api_key:
+            st.error("⚠️ Enter domain and API key first")
+            return
+        
+        st.markdown("---")
+        st.markdown("##### 📥 Syncing Tickets...")
+        
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
+        metrics = st.columns(4)
+        total_m = metrics[0].empty()
+        current_m = metrics[1].empty()
+        convs_m = metrics[2].empty()
+        errors_m = metrics[3].empty()
+        
+        try:
+            from core.freshdesk_api import FreshdeskClient, FreshdeskConfig
+            from core.session_state import set_data_loaded
+            from core.data_loader import Ticket
+            import json
+            
+            sync_config = FreshdeskConfig(
+                domain=domain,
+                api_key=api_key,
+                group_id=int(group_id) if group_id else None,
+                include_conversations=include_convs,
+                include_notes=include_notes,
+                days_to_fetch=int(days_to_fetch),
+            )
+            
+            client = FreshdeskClient(config=sync_config)
+            total_convs = 0
+            
+            def on_progress(progress):
+                nonlocal total_convs
+                
+                if progress.total > 0:
+                    progress_bar.progress(progress.current / progress.total)
+                
+                if progress.phase == "discovering":
+                    status_text.text("🔍 Discovering tickets...")
+                elif progress.phase == "fetching":
+                    status_text.text(f"⚙️ Fetching #{progress.current_ticket_id}...")
+                elif progress.phase == "complete":
+                    status_text.text("✅ Complete!")
+                
+                total_m.metric("Total", progress.total)
+                current_m.metric("Fetched", progress.current)
+                errors_m.metric("Errors", progress.errors)
+            
+            ticket_dicts = client.fetch_tickets(on_progress=on_progress)
+            
+            # Count conversations
+            for t in ticket_dicts:
+                total_convs += len(t.get('conversations', []))
+            convs_m.metric("Conversations", total_convs)
+            
+            if ticket_dicts:
+                # Save to file
+                output_path = Path(__file__).parent.parent.parent / "data" / "tickets.json"
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(output_path, 'w') as f:
+                    json.dump(ticket_dicts, f, indent=2, default=str)
+                
+                # Convert to Ticket objects
+                tickets = []
+                for data in ticket_dicts:
+                    try:
+                        tickets.append(Ticket.from_dict(data, {}))
+                    except:
+                        pass
+                
+                if tickets:
+                    set_data_loaded(tickets)
+                    st.success(f"✅ Loaded {len(tickets)} tickets with {total_convs} conversations!")
+                    st.balloons()
+                else:
+                    st.warning("Fetched but couldn't convert. Check format.")
+            else:
+                st.warning("No tickets found for criteria.")
+                
+        except Exception as e:
+            st.error(f"❌ Sync failed: {str(e)}")
+
+
 def render_settings():
     """Render the settings page."""
     
@@ -621,56 +799,23 @@ def render_settings():
     # =========================================================================
     with tabs[7]:
         st.subheader("Integrations")
-        st.caption("Connect to external services")
+        st.caption("Connect to external ticket systems")
         
-        st.markdown("##### Freshdesk API")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.text_input(
-                "Domain",
-                value=config.get('freshdesk', 'domain', default=''),
-                placeholder="your-company",
-                key="fd_domain"
-            )
-            
-            st.text_input(
-                "API Key",
-                type="password",
-                value=config.get('freshdesk', 'api_key', default=''),
-                key="fd_api_key"
-            )
-        
-        with col2:
-            st.number_input(
-                "Group ID (optional)",
-                value=config.get('freshdesk', 'group_id', default=0) or 0,
-                key="fd_group"
-            )
-            
-            st.number_input(
-                "Days to Fetch",
-                value=config.get('freshdesk', 'days_to_fetch', default=180),
-                min_value=1,
-                max_value=365,
-                key="fd_days"
-            )
-        
-        st.toggle(
-            "Include conversations",
-            value=config.get('freshdesk', 'include_conversations', default=True),
-            key="fd_convs"
+        # Connector selector - allows for future connectors
+        connector_type = st.selectbox(
+            "Ticket System",
+            options=["Freshdesk", "Zendesk (Coming Soon)", "Jira (Coming Soon)", "ServiceNow (Coming Soon)"],
+            index=0,
+            help="Select your ticket management system"
         )
         
-        st.toggle(
-            "Include private notes",
-            value=config.get('freshdesk', 'include_notes', default=True),
-            key="fd_notes"
-        )
+        st.divider()
         
-        if st.button("🔗 Test Freshdesk Connection"):
-            st.info("Connection test coming soon!")
+        if connector_type == "Freshdesk":
+            render_freshdesk_connector(config)
+        elif "Coming Soon" in connector_type:
+            st.info(f"🚧 {connector_type.replace(' (Coming Soon)', '')} integration is planned for a future release.")
+            st.caption("Contact us if you need this integration prioritized.")
         
         st.markdown("---")
         st.markdown("##### Agent Cache")

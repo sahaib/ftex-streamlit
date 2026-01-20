@@ -325,6 +325,12 @@ def apply_filters(tickets: list) -> list:
     return filtered
 
 
+def get_filtered_tickets() -> list:
+    """Get tickets from session state with current filters applied."""
+    tickets = st.session_state.get('tickets', [])
+    return apply_filters(tickets)
+
+
 # =============================================================================
 # CONVENIENCE FUNCTIONS
 # =============================================================================
@@ -342,6 +348,26 @@ def set_data_loaded(tickets: list, analysis_results: dict = None):
     
     # Auto-save to disk
     save_to_cache()
+    
+    # Trigger metrics cache recompute
+    _recompute_metrics(tickets)
+
+
+def _recompute_metrics(tickets: list):
+    """Recompute metrics cache when data changes."""
+    try:
+        from .metrics_cache import get_metrics_cache
+        from .config_manager import get_config
+        from .kv_cache import get_cache
+        
+        config = get_config()
+        kv_cache = get_cache()
+        
+        metrics_cache = get_metrics_cache()
+        metrics_cache.recompute(tickets, config, kv_cache)
+        print(f"[StateManager] Recomputed metrics for {len(tickets)} tickets")
+    except Exception as e:
+        print(f"[StateManager] Warning: Could not recompute metrics: {e}")
 
 
 def get_cache_info() -> dict:
@@ -362,5 +388,18 @@ def get_cache_info() -> dict:
             info['has_deep_analysis'] = bool(ai_data.get('deep_analysis'))
         except:
             pass
+    
+    # Add KV cache and metrics cache info
+    try:
+        from .kv_cache import get_cache
+        from .metrics_cache import get_metrics_cache
+        
+        kv_stats = get_cache().get_stats()
+        info['kv_cache'] = kv_stats
+        
+        metrics = get_metrics_cache()
+        info['metrics_valid'] = metrics.is_valid()
+    except:
+        pass
     
     return info
