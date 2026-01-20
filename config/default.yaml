@@ -1,0 +1,184 @@
+# FTEX Configuration
+# ==================
+# Copy this file to config/user/config.yaml and customize for your organization
+
+app:
+  name: FTEX Ticket Intelligence
+  version: 3.0.0
+  theme: light
+
+# Industry Configuration
+# Select a preset or customize for your industry
+industry:
+  name: General Support
+  preset: general  # Options: general, maritime, it_support, saas, ecommerce
+  primary_entity: customer  # What entity to track: customer, vessel, site, product
+  entity_field: company.name  # JSON path to entity in ticket data
+
+# SLA Configuration
+sla:
+  first_response_hours: 12
+  resolution_hours: 24
+  stale_threshold_days: 15
+  
+  # SLA targets by priority
+  by_priority:
+    Urgent:
+      first_response: 1
+      resolution: 4
+    High:
+      first_response: 4
+      resolution: 24
+    Medium:
+      first_response: 8
+      resolution: 72
+    Low:
+      first_response: 24
+      resolution: 168
+  
+  # Performance bands
+  bands:
+    excellent:
+      min: 95
+      max: 100
+      color: "#10B981"
+    good:
+      min: 90
+      max: 95
+      color: "#3B82F6"
+    acceptable:
+      min: 80
+      max: 90
+      color: "#F59E0B"
+    needs_improvement:
+      min: 70
+      max: 80
+      color: "#F97316"
+    poor:
+      min: 0
+      max: 70
+      color: "#EF4444"
+
+# Working Hours
+working_hours:
+  timezone: UTC
+  start_hour: 9
+  end_hour: 18
+  work_days: [0, 1, 2, 3, 4]  # Mon-Fri (0=Monday)
+  holiday_calendar: default  # Options: india, us, uk, singapore, norway
+
+# Ticket Categories
+categories:
+  auto_detect: true
+  custom:
+    - name: Bug Report
+      keywords: [bug, error, crash, broken, fails, not working]
+    - name: Feature Request
+      keywords: [feature, enhancement, suggestion, please add, would be nice]
+    - name: Configuration
+      keywords: [configure, setup, settings, config, configuration]
+    - name: Activation/License
+      keywords: [license, activation, subscription, product key, renew]
+    - name: Integration/Sync
+      keywords: [sync, integration, api, connection, webhook]
+    - name: Installation
+      keywords: [install, deploy, upgrade, update, migration]
+    - name: Training
+      keywords: [training, how to, documentation, guide, tutorial]
+    - name: Follow-up
+      keywords: [follow up, following up, any update, reminder, status]
+    - name: Acknowledgment
+      keywords: [thank you, thanks, acknowledged, noted, received]
+
+# Canned Response Detection
+canned_responses:
+  detect: true
+  threshold_phrases: 3
+  patterns:
+    acknowledgement: "we acknowledge safe receipt"
+    follow_up: "this is a follow up"
+    product_key: "please apply the below product key"
+    teamviewer: "we request you to provide us following credentials"
+    clear_cache: "browser cache is not cleared"
+    generic_template: "we noticed you have a query"
+
+# Configuration Issue Detection
+config_issues:
+  detect: true
+  types:
+    access_issues:
+      name: Accessibility Issues
+      keywords: [inaccessible, cannot access, not loading, forbidden, blocked]
+      fault_indicators: [issue has been resolved, access restored]
+    activity_issues:
+      name: Activity Configuration
+      keywords: [unable to transfer, activity not available, not authorized]
+      fault_indicators: [activity has been enabled, activity was added]
+    data_issues:
+      name: Data/Template Issues
+      keywords: [incorrect data, wrong template, missing field, data error]
+      fault_indicators: [data has been corrected, template updated]
+
+# 24h Promise Tracking
+promise_tracking:
+  enabled: true
+  window_hours: 24
+  patterns:
+    - "(?:will|we'll) (?:get back|revert|respond) (?:within|in) 24"
+    - "within (?:the next )?24\\s*(?:hours?|hrs?)"
+    - "get back to you (?:soon|shortly|asap)"
+    - "will update you (?:soon|shortly)"
+
+# Internal Dependency Tracking
+dependency_tracking:
+  enabled: true
+  patterns:
+    - "kindly request you to assist"
+    - "need your assistance"
+    - "please (?:help|assist|advise|clarify)"
+    - "forwarding (?:this|the) (?:query|issue)"
+    - "escalating (?:this|to you)"
+
+# AI Configuration
+ai:
+  provider: ollama  # Options: ollama, openai, anthropic, none
+  
+  ollama:
+    base_url: http://localhost:11434
+    model: qwen2.5:14b
+    temperature: 0.3
+  
+  openai:
+    model: gpt-4o-mini
+    temperature: 0.3
+  
+  features:
+    issue_clustering: true
+    root_cause_analysis: true
+    auto_categorization: true
+    sentiment_analysis: false
+
+# Freshdesk Integration
+freshdesk:
+  domain: ""  # Your Freshdesk domain (e.g., "mycompany")
+  api_key: ""  # Your API key (or set FRESHDESK_API_KEY env var)
+  group_id: null  # Optional: specific group ID
+  include_conversations: true
+  include_notes: true
+  days_to_fetch: 180
+
+# Agent Cache
+agent_cache:
+  enabled: true
+  file: .agent_cache.json
+  excel_file: agents.xlsx
+
+# Export Settings
+export:
+  excel:
+    include_charts: true
+    include_formulas: true
+    password_protect: false
+  pdf:
+    include_charts: true
+    page_size: A4

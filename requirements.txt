@@ -1,0 +1,44 @@
+# FTEX Ticket Intelligence Platform
+# Requirements
+
+# Core
+streamlit>=1.31.0
+pyyaml>=6.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+openpyxl>=3.1.0
+
+# Visualization
+plotly>=5.18.0
+altair>=5.0.0
+
+# HTTP/API
+requests>=2.31.0
+httpx>=0.25.0
+
+# Streaming JSON (for large files)
+ijson>=3.2.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# PDF generation (optional)
+reportlab>=4.0.0
+# weasyprint>=60.0  # Optional, requires system deps
+
+# AI/LLM (optional)
+# openai>=1.0.0
+# anthropic>=0.20.0
+
+# Date handling
+python-dateutil>=2.8.0
+pytz>=2024.1
+
+# Rich terminal (for CLI)
+rich>=13.0.0
+
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0

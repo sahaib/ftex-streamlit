@@ -1,0 +1,24 @@
+[server]
+# Maximum upload size in MB (2GB for large ticket exports)
+maxUploadSize = 2000
+
+# Enable XSRF protection
+enableXsrfProtection = true
+
+# Maximum message size for websocket (2GB)
+maxMessageSize = 2000
+
+[browser]
+# Gather usage stats
+gatherUsageStats = false
+
+[theme]
+# Default theme (can be customized via Branding settings)
+primaryColor = "#1F4E79"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F8FAFC"
+textColor = "#1E1E2E"
+
+[client]
+# Show error details for debugging
+showErrorDetails = true

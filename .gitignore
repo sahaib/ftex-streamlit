@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Project cache files (auto-generated, contains user data)
+data/cache/
+*.pkl
+data/cache/tickets_cache.pkl
+data/cache/state_cache.json
+data/cache/ai_analysis_cache.json
+
+# Config user overrides (contains API keys)
+config/user/
+
+# Agent cache
+.agent_cache.json
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
