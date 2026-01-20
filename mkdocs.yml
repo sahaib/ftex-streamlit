@@ -1,0 +1,150 @@
+# FTEX Documentation
+# https://ftex-streamlit.readthedocs.io
+
+site_name: FTEX Documentation
+site_url: https://ftex-streamlit.readthedocs.io
+site_author: Sahaib Singh
+site_description: >-
+  AI-Powered Ticket Intelligence Platform - Open-source, self-hosted 
+  support analytics with comprehensive reporting.
+
+repo_name: sahaib/ftex-streamlit
+repo_url: https://github.com/sahaib/ftex-streamlit
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2024-2026 Sahaib Singh
+
+theme:
+  name: material
+  language: en
+  
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+  
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/ticket-confirmation
+  
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: sahaib
+      repo: ftex-streamlit
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/sahaib/ftex-streamlit
+  generator: false
+
+extra_css:
+  - assets/extra.css
+
+nav:
+  - Home: index.md
+  
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Docker: getting-started/docker.md
+  
+  - User Guide:
+    - Dashboard: user-guide/dashboard.md
+    - AI Analysis: user-guide/ai-analysis.md
+    - SLA Metrics: user-guide/sla-metrics.md
+    - Agents: user-guide/agents.md
+    - Entities: user-guide/entities.md
+    - Export: user-guide/export.md
+  
+  - Configuration:
+    - Overview: configuration/index.md
+    - Industry Presets: configuration/presets.md
+    - SLA Settings: configuration/sla.md
+    - Categories: configuration/categories.md
+    - AI Providers: configuration/ai-providers.md
+  
+  - API Reference:
+    - Data Loader: api/data-loader.md
+    - Config Manager: api/config-manager.md
+    - Report Generator: api/report-generator.md
+  
+  - Development:
+    - Contributing: development/contributing.md
+    - Architecture: development/architecture.md
+    - Roadmap: development/roadmap.md
+  
+  - FAQ: faq.md
+  - Changelog: changelog.md

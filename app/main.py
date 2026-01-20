@@ -457,8 +457,8 @@ def main():
         
         # Footer
         st.markdown("---")
-        st.caption("FTEX v3.0 | Open Source")
-        st.caption("[GitHub](https://github.com/sahaib/FTEX) | [Docs](https://ftex.readthedocs.io)")
+        st.caption("FTEX v3.1 | Open Source")
+        st.caption("[GitHub](https://github.com/sahaib/ftex-streamlit) | [Docs](https://ftex.readthedocs.io)")
     
     # Main content
     # Beta Badge (always visible)

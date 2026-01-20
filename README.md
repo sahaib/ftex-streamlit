@@ -251,7 +251,7 @@ Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md).
 
 ```bash
 # Fork and clone
-git clone https://github.com/YOUR_USERNAME/FTEX.git
+git clone https://github.com/sahaib/ftex-streamlit.git
 
 # Create branch
 git checkout -b feature/amazing-feature
@@ -281,4 +281,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **Made with ❤️ by the FTEX community**
 
-[GitHub](https://github.com/sahaib/FTEX) | [Documentation](https://ftex.readthedocs.io) | [Issues](https://github.com/sahaib/FTEX/issues)
+[GitHub](https://github.com/sahaib/ftex-streamlit) | [Documentation](https://ftex.readthedocs.io) | [Issues](https://github.com/sahaib/ftex-streamlit/issues)
