@@ -165,11 +165,11 @@ def render_ai_page():
     # =========================================================================
     tabs = st.tabs([
         "🎯 Issue Clusters",
-        "� Sentiment",
+        "😄 Sentiment",
         "🔄 Recurring Issues",
         "⏰ Promise Tracker",
         "🚨 Escalation Watch",
-        "�🔍 Root Causes", 
+        "🔍 Root Causes", 
         "📊 Category Intelligence",
         "💡 Recommendations"
     ])
